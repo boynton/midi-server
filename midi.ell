@@ -5,7 +5,7 @@
   (sleep dur)
   (midi-write d1 d2 d3))
 
-(defn midi-damper (n)
+(defn midi-sustain (n)
   (midi-write 176 64 n))
 
 (defn midi-note (key vel dur)

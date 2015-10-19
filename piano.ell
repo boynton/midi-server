@@ -1,17 +1,5 @@
 (use midi)
 
-(defn midi-write-after (dur d1 d2 d3)
-  (sleep dur)
-  (midi-write d1 d2 d3))
-
-(defn midi-sustain (n)
-  (midi-write 176 64 n))
-
-(defn midi-note (key vel dur)
-  (midi-write 144 key vel)
-  (spawn midi-write-after dur 128 key 0))
-
-
 (def server (listen 8888))
 (println "piano-server: " server)
 
