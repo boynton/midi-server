@@ -1,0 +1,46 @@
+(use midi)
+
+(defn midi-write-after (dur d1 d2 d3)
+  (sleep dur)
+  (midi-write d1 d2 d3))
+
+(defn midi-sustain (n)
+  (midi-write 176 64 n))
+
+(defn midi-note (key vel dur)
+  (midi-write 144 key vel)
+  (spawn midi-write-after dur 128 key 0))
+
+
+(def server (listen 8888))
+(println "piano-server: " server)
+
+(defn handler (con)
+  (let ((input (input: con)) (output (output: con)) (timeout 60)
+        (commands (struct 'note midi-note 'sustain midi-sustain)))
+    (println "accepted: " con)
+    (let loop ((req (recv input timeout)))
+      (if (not (null? req))
+          (let ((event (to-list (car (read (to-string req))))))
+            (println "event received: " event)
+            (let ((time (car event)) (op (cadr event)) (args (cddr event)))
+              (let ((fun (get commands op)))
+                (if (null? fun)
+                    (println "Unhandled operation: " op)
+                    (apply fun args))))
+            (loop (recv input timeout)))
+          (do
+            (println "connection closed")
+            (close input)
+            (close output))))))
+
+(defn tcp-connection? (o)
+  (identical? <tcp-connection> (type o)))
+
+(let loop ((con (recv server 10)))
+  (if (tcp-connection? con)
+      (do
+        (println "accepted a connection: " con)
+        (spawn handler con))
+      (println "[waiting...]"))
+  (loop (recv server 10)))
