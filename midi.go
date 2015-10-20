@@ -30,7 +30,7 @@ var bufsizeKey = ell.Intern("bufsize:")
 func initMidi() error {
    ell.DefineFunctionKeyArgs("midi-open", midiOpen, ell.NullType,
 		[]*ell.LOB{ell.StringType, ell.StringType, ell.NumberType},
-		[]*ell.LOB{ell.EmptyString, ell.EmptyString, ell.NewInt(1024)},
+		[]*ell.LOB{ell.EmptyString, ell.EmptyString, ell.Number(1024)},
 		[]*ell.LOB{inputKey, outputKey, bufsizeKey})
 	ell.DefineFunction("midi-write", midiWrite, ell.NullType, ell.NumberType, ell.NumberType, ell.NumberType)
 	ell.DefineFunction("midi-close", midiClose, ell.NullType)
@@ -115,12 +115,12 @@ func midiOpen(argv []*ell.LOB) (*ell.LOB, error) {
 	}
 	result := ell.MakeStruct(4)
 	if midiInDevice != "" {
-		ell.Put(result, inputKey, ell.NewString(midiInDevice))
+		ell.Put(result, inputKey, ell.String(midiInDevice))
 	}
 	if midiOutDevice != "" {
-		ell.Put(result, outputKey, ell.NewString(midiOutDevice))
+		ell.Put(result, outputKey, ell.String(midiOutDevice))
 	}
-	ell.Put(result, bufsizeKey, ell.NewInt64(midiBufsize))
+	ell.Put(result, bufsizeKey, ell.Number(float64(midiBufsize)))
 	return result, nil
 }
 
@@ -158,7 +158,7 @@ func midiListen(argv []*ell.LOB) (*ell.LOB, error) {
 	ch := ell.Null
 	midiMutex.Lock()
 	if midiIn != nil {
-		ch = ell.NewChannel(int(midiBufsize), "midi")
+		ch = ell.Channel(int(midiBufsize), "midi")
 		go func(s *portmidi.Stream, ch *ell.LOB) {
 			for {
 				time.Sleep(10 * time.Millisecond)
@@ -166,14 +166,14 @@ func midiListen(argv []*ell.LOB) (*ell.LOB, error) {
 				if err != nil {
 					continue
 				}
-				channel := ell.ChannelHandle(ch)
+				channel := ell.ChannelValue(ch)
 				if channel != nil {
 					for _, ev := range events {
 						ts := (float64(ev.Timestamp) / 1000) + midiBaseTime
 						st := ev.Status
 						d1 := ev.Data1
 						d2 := ev.Data2
-						channel <- ell.List(ell.NewFloat64(ts), ell.NewInt64(st), ell.NewInt64(d1), ell.NewInt64(d2))
+						channel <- ell.List(ell.Number(ts), ell.Number(float64(st)), ell.Number(float64(d1)), ell.Number(float64(d2)))
 					}
 				}
 			}

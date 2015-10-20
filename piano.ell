@@ -9,7 +9,7 @@
     (println "accepted: " con)
     (let loop ((req (recv input timeout)))
       (if (not (null? req))
-          (let ((event (to-list (car (read (to-string req))))))
+          (let ((event (to-list (read (to-string req)))))
             (println "event received: " event)
             (let ((time (car event)) (op (cadr event)) (args (cddr event)))
               (let ((fun (get commands op)))
