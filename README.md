@@ -12,8 +12,8 @@ framed. A single varint defined the number of bytes in the frame, followed by th
 of the frame is currently JSON array where the first element is the operation, and other elements are
 the parameters of the operation:
 
-   ["note" key vel dur]
-   ["sustain" amount]
+    ["note" key vel dur]
+    ["sustain" amount]
 
 The note-offs are scheduled the duration time into the future, and are guaranteed to happen even if the
 client closed the connection before scheduled time.
