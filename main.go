@@ -19,7 +19,7 @@ func (ps *MidiEnabled) Cleanup() {
 }
 
 func main() {
-   ell.SetFlags(true, false, false, false, false)
+	ell.SetFlags(true, false, false, false, false)
 	ell.Init(new(MidiEnabled))
 	ell.Run("piano")
 }

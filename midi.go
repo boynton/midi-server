@@ -28,7 +28,7 @@ var outputKey = ell.Intern("output:")
 var bufsizeKey = ell.Intern("bufsize:")
 
 func initMidi() error {
-   ell.DefineFunctionKeyArgs("midi-open", midiOpen, ell.NullType,
+	ell.DefineFunctionKeyArgs("midi-open", midiOpen, ell.NullType,
 		[]*ell.Object{ell.StringType, ell.StringType, ell.NumberType},
 		[]*ell.Object{ell.EmptyString, ell.EmptyString, ell.Number(1024)},
 		[]*ell.Object{inputKey, outputKey, bufsizeKey})
@@ -80,8 +80,8 @@ func findMidiOutputDevice(name string) (portmidi.DeviceId, string) {
 }
 
 func midiOpen(argv []*ell.Object) (*ell.Object, error) {
-//	defaultInput := "USB Oxygen 8 v2"
-//	defaultOutput := "IAC Driver Bus 1"
+	//	defaultInput := "USB Oxygen 8 v2"
+	//	defaultOutput := "IAC Driver Bus 1"
 	latency := int64(10)
 	if !midiOpened {
 		err := portmidi.Initialize()
@@ -111,7 +111,7 @@ func midiOpen(argv []*ell.Object) (*ell.Object, error) {
 			}
 		}
 		midiBaseTime = ell.Now()
-		
+
 	}
 	result := ell.MakeStruct(4)
 	if midiInDevice != "" {
@@ -182,4 +182,3 @@ func midiListen(argv []*ell.Object) (*ell.Object, error) {
 	midiMutex.Unlock()
 	return ch, nil
 }
-
