@@ -1,4 +1,7 @@
 (use midi)
+(println (version))
+
+(def *midi-config* (midi-open))
 
 (def server (listen 8888))
 (println "piano-server: " server)

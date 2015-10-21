@@ -1,0 +1,54 @@
+(def *piano* null)
+(def *now* 0)
+
+(defn piano-connect ()
+  (if (null? *piano*)
+      (set! *piano* (connect "127.0.0.1" 8888)))
+  true)
+
+(defn note (key vel dur)
+  (and (not (null? *piano*))
+       (send (output: *piano*) (write (vector *now* 'note key vel dur)))))
+
+(defn sustain (amount)
+  (and (not (null? *piano*)) (send (output: *piano*) (write (vector *now* 'sustain amount)))))
+  
+(defn piano-reset ()
+  (and (not (null? *piano*)) (send (output: *piano*) (write (vector 'reset)))))
+
+;;(defn piano-listen ()
+;;  (if (not (null? *piano*))
+;;      (input: *piano*)))
+
+(defn piano-disconnect ()
+  (and (not (null? *piano*))
+       (close *piano*)
+       (set! *piano* null)))
+
+(piano-connect)
+
+(defn piano-test ()
+   (dorange (i 21 108)
+     (note i 50 .1)
+     (sleep .1)))
+
+(defn random-phrase (base)
+  (dolist (k (map int (random-list 12 (- base 7) (+ base 7))))
+    (note k 75 0.09)
+    (sleep .1)))
+
+(defn piano-test1 ()
+  (note 36 100 2))
+
+(defn piano-test2 ()
+  (let loop ((k 60))
+    (random-phrase k)
+    (loop (random 36 84))))
+
+;;(defn piano-test3 ()
+;;  (let ((ch (piano-listen))) ;;probably should just be a global channel
+;;    (let loop ((tmp (recv ch 1)))
+;;      (if (not (null? tmp))
+;;          (println tmp)
+;;          (println "[" (now) "]"))
+;;      (loop (recv ch 1)))))
