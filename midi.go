@@ -29,9 +29,9 @@ var bufsizeKey = ell.Intern("bufsize:")
 
 func initMidi() error {
    ell.DefineFunctionKeyArgs("midi-open", midiOpen, ell.NullType,
-		[]*ell.LOB{ell.StringType, ell.StringType, ell.NumberType},
-		[]*ell.LOB{ell.EmptyString, ell.EmptyString, ell.Number(1024)},
-		[]*ell.LOB{inputKey, outputKey, bufsizeKey})
+		[]*ell.Object{ell.StringType, ell.StringType, ell.NumberType},
+		[]*ell.Object{ell.EmptyString, ell.EmptyString, ell.Number(1024)},
+		[]*ell.Object{inputKey, outputKey, bufsizeKey})
 	ell.DefineFunction("midi-write", midiWrite, ell.NullType, ell.NumberType, ell.NumberType, ell.NumberType)
 	ell.DefineFunction("midi-close", midiClose, ell.NullType)
 	ell.DefineFunction("midi-listen", midiListen, ell.ChannelType)
@@ -79,7 +79,7 @@ func findMidiOutputDevice(name string) (portmidi.DeviceId, string) {
 	return id, info.Name
 }
 
-func midiOpen(argv []*ell.LOB) (*ell.LOB, error) {
+func midiOpen(argv []*ell.Object) (*ell.Object, error) {
 //	defaultInput := "USB Oxygen 8 v2"
 //	defaultOutput := "IAC Driver Bus 1"
 	latency := int64(10)
@@ -128,7 +128,7 @@ func midiAllNotesOff() {
 	midiOut.WriteShort(0xB0, 0x7B, 0x00)
 }
 
-func midiClose(argv []*ell.LOB) (*ell.LOB, error) {
+func midiClose(argv []*ell.Object) (*ell.Object, error) {
 	midiMutex.Lock()
 	if midiOut != nil {
 		midiAllNotesOff()
@@ -141,7 +141,7 @@ func midiClose(argv []*ell.LOB) (*ell.LOB, error) {
 
 // (midi-write 144 60 80) -> middle C note on
 // (midi-write 128 60 0) -> middle C note off
-func midiWrite(argv []*ell.LOB) (*ell.LOB, error) {
+func midiWrite(argv []*ell.Object) (*ell.Object, error) {
 	status := ell.Int64Value(argv[0])
 	data1 := ell.Int64Value(argv[1])
 	data2 := ell.Int64Value(argv[2])
@@ -154,12 +154,12 @@ func midiWrite(argv []*ell.LOB) (*ell.LOB, error) {
 	return ell.Null, err
 }
 
-func midiListen(argv []*ell.LOB) (*ell.LOB, error) {
+func midiListen(argv []*ell.Object) (*ell.Object, error) {
 	ch := ell.Null
 	midiMutex.Lock()
 	if midiIn != nil {
 		ch = ell.Channel(int(midiBufsize), "midi")
-		go func(s *portmidi.Stream, ch *ell.LOB) {
+		go func(s *portmidi.Stream, ch *ell.Object) {
 			for {
 				time.Sleep(10 * time.Millisecond)
 				events, err := s.Read(1024)
