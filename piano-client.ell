@@ -32,23 +32,29 @@
      (note i 50 .1)
      (sleep .1)))
 
-(defn random-phrase (base)
+(defn random-phrase (base period)
   (dolist (k (map int (random-list 12 (- base 7) (+ base 7))))
     (note k 75 0.09)
-    (sleep .1)))
+    (sleep period)))
 
 (defn piano-test1 ()
   (note 36 100 2))
 
 (defn piano-test2 ()
   (let loop ((k 60))
-    (random-phrase k)
+    (random-phrase k .1)
     (loop (random 36 84))))
 
-;;(defn piano-test3 ()
-;;  (let ((ch (piano-listen))) ;;probably should just be a global channel
-;;    (let loop ((tmp (recv ch 1)))
-;;      (if (not (null? tmp))
-;;          (println tmp)
-;;          (println "[" (now) "]"))
-;;      (loop (recv ch 1)))))
+(defn piano-test3 ()
+  (spawn piano-test2)
+  (let loop ((k 60))
+    (random-phrase k 1 100)
+    (loop (random 24 36))))
+
+(defn piano-test4 ()
+  (let ((ch (piano-listen))) ;;probably should just be a global channel
+    (let loop ((tmp (recv ch 1)))
+      (if (not (null? tmp))
+          (println tmp)
+          (println "[" (now) "]"))
+      (loop (recv ch 1)))))

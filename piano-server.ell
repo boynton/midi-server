@@ -13,7 +13,7 @@
     (let loop ((req (recv input timeout)))
       (if (not (null? req))
           (let ((event (to-list (read (to-string req)))))
-            (println "event received: " event)
+            ;(println "event received: " event)
             (let ((time (car event)) (op (cadr event)) (args (cddr event)))
               (let ((fun (get commands op)))
                 (if (null? fun)
@@ -30,8 +30,5 @@
 
 (let loop ((con (recv server 10)))
   (if (tcp-connection? con)
-      (do
-        (println "accepted a connection: " con)
         (spawn handler con))
-      (println "[waiting...]"))
   (loop (recv server 10)))
